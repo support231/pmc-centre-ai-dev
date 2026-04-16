@@ -71,7 +71,7 @@ export default function Home() {
 
   return () => window.removeEventListener("message", handler);
 
-}, []);
+},
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
