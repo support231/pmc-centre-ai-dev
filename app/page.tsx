@@ -49,13 +49,14 @@ export default function Home() {
 
   useEffect(() => {
 
+  // ✅ USER DATA LISTENER
   (window as any).PMC_USER = {
     userId: null,
     email: null
   };
 
-  const handler = (event) => {
-    console.log("RAW MESSAGE:", event.data); // 👈 MUST SEE THIS
+  const handler = (event: MessageEvent) => {
+    console.log("RAW MESSAGE:", event.data);
 
     if (!event.data || event.data.type !== "USER_DATA") return;
 
@@ -69,12 +70,15 @@ export default function Home() {
 
   window.addEventListener("message", handler);
 
-  return () => window.removeEventListener("message", handler);
+  // ✅ YOUR EXISTING SCROLL LOGIC (KEEP IT HERE)
+  chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
-},
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, loading]);
+  // ✅ CLEANUP
+  return () => {
+    window.removeEventListener("message", handler);
+  };
 
+}, [messages, loading]);
   /* =======================
      MODE / CHAT RESET
      ======================= */
