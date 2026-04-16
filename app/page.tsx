@@ -48,25 +48,30 @@ export default function Home() {
      ======================= */
 
   useEffect(() => {
-    (window as any).PMC_USER = {
+
+  (window as any).PMC_USER = {
     userId: null,
     email: null
   };
 
-  const handler = (event: MessageEvent) => {
+  const handler = (event) => {
+    console.log("RAW MESSAGE:", event.data); // 👈 MUST SEE THIS
+
     if (!event.data || event.data.type !== "USER_DATA") return;
 
-    (window as any).PMC_USER.userId = event.data.userId;
-    (window as any).PMC_USER.email = event.data.email;
+    (window as any).PMC_USER = {
+      userId: event.data.userId,
+      email: event.data.email
+    };
 
     console.log("✅ User received:", (window as any).PMC_USER);
   };
 
   window.addEventListener("message", handler);
 
-  return () => {
-    window.removeEventListener("message", handler);
-  };
+  return () => window.removeEventListener("message", handler);
+
+}, []);
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
