@@ -56,18 +56,17 @@ export default function Home() {
   };
 
   const handler = (event: MessageEvent) => {
-    console.log("RAW MESSAGE:", event.data);
+  console.log("RAW MESSAGE:", event.origin, event.data); // ✅ ADD THIS LINE
 
-    if (!event.data || event.data.type !== "USER_DATA") return;
+  if (!event.data || event.data.type !== "USER_DATA") return;
 
-    (window as any).PMC_USER = {
-      userId: event.data.userId,
-      email: event.data.email
-    };
-
-    console.log("✅ User received:", (window as any).PMC_USER);
+  (window as any).PMC_USER = {
+    userId: event.data.userId,
+    email: event.data.email
   };
 
+  console.log("✅ User received:", (window as any).PMC_USER);
+};
   window.addEventListener("message", handler);
 
   // ✅ YOUR EXISTING SCROLL LOGIC (KEEP IT HERE)
