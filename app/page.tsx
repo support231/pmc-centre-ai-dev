@@ -216,7 +216,7 @@ console.log("📤 Sent to Wix:", chatData);
   window.parent.postMessage(chatData, "*");
 
   console.log("📤 Sent to Wix (error):", chatData);
-}
+
     } finally {
       setLoading(false);
     }
