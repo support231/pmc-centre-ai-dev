@@ -195,19 +195,23 @@ const chatData = {
 window.parent.postMessage(chatData, "*");
 
 console.log("📤 Sent to Wix:", chatData);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "I may not have fully understood your question. Could you please clarify what you want me to focus on?",
-        },
-      ]);
-        // ✅ SEND CHAT DATA TO WIX (ERROR CASE)
+  } catch {
+
+  const fallbackAnswer = "I may not have fully understood your question. Could you please clarify what you want me to focus on?";
+
+  setMessages((prev) => [
+    ...prev,
+    {
+      role: "assistant",
+      content: fallbackAnswer,
+    },
+  ]);
+
+  // ✅ SEND CHAT DATA TO WIX
   const chatData = {
     type: "CHAT_DATA",
     question: input,
-    answer: fallbackAnswer,
+    answer: fallbackAnswer, // ✅ NOW DEFINED
     userId: (window as any).PMC_USER?.userId,
     email: (window as any).PMC_USER?.email,
     timestamp: new Date().toISOString()
