@@ -182,6 +182,19 @@ export default function Home() {
           content: data.answer || "No answer received.",
         },
       ]);
+      // ✅ SEND CHAT DATA TO WIX
+const chatData = {
+  type: "CHAT_DATA",
+  question: input, // your question variable
+  answer: data.answer || "No answer received.",
+  userId: (window as any).PMC_USER?.userId,
+  email: (window as any).PMC_USER?.email,
+  timestamp: new Date().toISOString()
+};
+
+window.parent.postMessage(chatData, "*");
+
+console.log("📤 Sent to Wix:", chatData);
     } catch {
       setMessages((prev) => [
         ...prev,
@@ -190,6 +203,20 @@ export default function Home() {
           content: "I may not have fully understood your question. Could you please clarify what you want me to focus on?",
         },
       ]);
+        // ✅ SEND CHAT DATA TO WIX (ERROR CASE)
+  const chatData = {
+    type: "CHAT_DATA",
+    question: input,
+    answer: fallbackAnswer,
+    userId: (window as any).PMC_USER?.userId,
+    email: (window as any).PMC_USER?.email,
+    timestamp: new Date().toISOString()
+  };
+
+  window.parent.postMessage(chatData, "*");
+
+  console.log("📤 Sent to Wix (error):", chatData);
+}
     } finally {
       setLoading(false);
     }
