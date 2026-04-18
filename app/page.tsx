@@ -197,7 +197,12 @@ try {
   const data = await response.json();
 
   const answer = data.answer || "No answer received.";
-
+  // ✅ 1. SHOW IN UI (THIS WAS BROKEN)
+setMessages((prev) => [
+  ...prev,
+  { role: "assistant", content: answer },
+]);
+  
   const chatData = {
     type: "CHAT_DATA",
     question: capturedQuestion,   // ✅ FIXED
@@ -212,7 +217,12 @@ try {
 } catch (error) {
 
   const fallbackAnswer = "Error generating response.";
-
+  // ✅ 1. SHOW IN UI (THIS WAS BROKEN)
+setMessages((prev) => [
+  ...prev,
+  { role: "assistant", content: answer },
+]);
+  
   const chatData = {
     type: "CHAT_DATA",
     question: capturedQuestion,   // ✅ FIXED
