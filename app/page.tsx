@@ -156,6 +156,7 @@ export default function Home() {
         )
         .join("\n");
 
+      const question = contextText; // ✅ FIX: stable question
       const formData = new FormData();
       formData.append("question", contextText);
       formData.append("mode", mode);
@@ -185,7 +186,7 @@ export default function Home() {
       // ✅ SEND CHAT DATA TO WIX
 const chatData = {
   type: "CHAT_DATA",
-  question: input, // your question variable
+  question: question, // your question variable // ✅ FIXED
   answer: data.answer || "No answer received.",
   userId: (window as any).PMC_USER?.userId,
   email: (window as any).PMC_USER?.email,
@@ -210,7 +211,7 @@ console.log("📤 Sent to Wix:", chatData);
   // ✅ SEND CHAT DATA TO WIX
   const chatData = {
     type: "CHAT_DATA",
-    question: input,
+    question: question,// ✅ FIXED
     answer: fallbackAnswer, // ✅ NOW DEFINED
     userId: (window as any).PMC_USER?.userId,
     email: (window as any).PMC_USER?.email,
