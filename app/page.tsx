@@ -175,7 +175,6 @@ export default function Home() {
       );
 
       // ✅ Capture question BEFORE anything changes
-const capturedQuestion = contextText;
 
 const sendToWix = (payload: any) => {
   try {
