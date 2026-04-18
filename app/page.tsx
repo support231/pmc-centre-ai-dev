@@ -186,7 +186,7 @@ const sendToWix = (payload: any) => {
 };
 
 try {
-  const response = await fetch("/api/chat", {
+  const apiResponse = await fetch("/api/chat", {
     method: "POST",
     body: JSON.stringify({
       question: contextText,
@@ -194,7 +194,7 @@ try {
     }),
   });
 
-const response = await fetch("/api/chat", {
+const apiResponse = await fetch("/api/chat", {
   method: "POST",
   body: JSON.stringify({
     question: contextText,
@@ -206,12 +206,12 @@ const response = await fetch("/api/chat", {
 let answer = "No answer received.";
 
 try {
-  const data = await response.json();
+  const data = await apiResponse.json();
   answer = data?.answer || answer;
 } catch (err) {
   console.log("⚠️ JSON parse failed, trying text");
 
-  const text = await response.text();
+  const text = await apiResponse.text();
   answer = text || answer;
 }
 
