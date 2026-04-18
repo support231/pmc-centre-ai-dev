@@ -156,7 +156,7 @@ export default function Home() {
         )
         .join("\n");
 
-      const question = contextText; // ✅ FIX: stable question
+      const capturedQuestion = contextText; // ✅ FIX: stable question
       const formData = new FormData();
       formData.append("question", contextText);
       formData.append("mode", mode);
@@ -175,7 +175,7 @@ export default function Home() {
       );
 
       // ✅ Capture question BEFORE anything changes
-const question = contextText;
+const capturedQuestion = contextText;
 
 const sendToWix = (payload: any) => {
   try {
@@ -201,7 +201,7 @@ try {
 
   const chatData = {
     type: "CHAT_DATA",
-    question: question,   // ✅ FIXED
+    question: capturedQuestion,   // ✅ FIXED
     answer: answer,
     userId: (window as any).PMC_USER?.userId || "",
     email: (window as any).PMC_USER?.email || "",
@@ -216,7 +216,7 @@ try {
 
   const chatData = {
     type: "CHAT_DATA",
-    question: question,   // ✅ FIXED
+    question: capturedQuestion,   // ✅ FIXED
     answer: fallbackAnswer,
     userId: (window as any).PMC_USER?.userId || "",
     email: (window as any).PMC_USER?.email || "",
