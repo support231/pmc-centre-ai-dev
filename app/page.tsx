@@ -194,45 +194,50 @@ try {
     }),
   });
 
-  const data = await response.json();
+  // ✅ GET RESPONSE FIRST
+const data = await response.json();
 
-  const answer = data.answer || "No answer received.";
-  // ✅ 1. SHOW IN UI (THIS WAS BROKEN)
+// ✅ DEFINE answer (THIS WAS MISSING)
+const answer = data?.answer || "No answer received.";
+
+// ✅ 1. SHOW IN UI
 setMessages((prev) => [
   ...prev,
   { role: "assistant", content: answer },
 ]);
-  
-  const chatData = {
-    type: "CHAT_DATA",
-    question: capturedQuestion,   // ✅ FIXED
-    answer: answer,
-    userId: (window as any).PMC_USER?.userId || "",
-    email: (window as any).PMC_USER?.email || "",
-    timestamp: new Date().toISOString()
-  };
 
-  sendToWix(chatData);
+// ✅ 2. SEND TO WIX
+const chatData = {
+  type: "CHAT_DATA",
+  question: capturedQuestion,
+  answer: answer,
+  userId: (window as any).PMC_USER?.userId || "",
+  email: (window as any).PMC_USER?.email || "",
+  timestamp: new Date().toISOString(),
+};
 
+sendToWix(chatData);
 } catch (error) {
 
   const fallbackAnswer = "Error generating response.";
-  // ✅ 1. SHOW IN UI (THIS WAS BROKEN)
+
+// SHOW IN UI
 setMessages((prev) => [
   ...prev,
-  { role: "assistant", content: answer },
+  { role: "assistant", content: fallbackAnswer },
 ]);
-  
-  const chatData = {
-    type: "CHAT_DATA",
-    question: capturedQuestion,   // ✅ FIXED
-    answer: fallbackAnswer,
-    userId: (window as any).PMC_USER?.userId || "",
-    email: (window as any).PMC_USER?.email || "",
-    timestamp: new Date().toISOString()
-  };
 
-  sendToWix(chatData);
+// SEND TO WIX
+const chatData = {
+  type: "CHAT_DATA",
+  question: capturedQuestion,
+  answer: fallbackAnswer,
+  userId: (window as any).PMC_USER?.userId || "",
+  email: (window as any).PMC_USER?.email || "",
+  timestamp: new Date().toISOString(),
+};
+
+sendToWix(chatData);
 }
 
 
