@@ -133,9 +133,11 @@ export default function Home() {
 async function sendMessage() {
   if (!input.trim() || !mode) return;
 
+  const questionText = input.trim(); // ✅ single stable variable
+
   const userMsg: ChatMessage = {
     role: "user",
-    content: input.trim(),
+    content: questionText,
     files: selectedFiles.length ? selectedFiles : undefined,
   };
 
@@ -146,7 +148,8 @@ async function sendMessage() {
   setLoading(true);
 
   try {
-    const contextText = updatedMessages
+    // ✅ build context safely INSIDE function
+    const contextTextLocal = updatedMessages
       .slice(-6)
       .map((m) =>
         m.role === "user"
@@ -156,7 +159,7 @@ async function sendMessage() {
       .join("\n");
 
     const formData = new FormData();
-    formData.append("question", contextText);
+    formData.append("question", contextTextLocal);
     formData.append("mode", mode);
 
     userMsg.files?.forEach((file) => {
@@ -181,17 +184,17 @@ async function sendMessage() {
       answer = text || answer;
     }
 
-    // ✅ SHOW IN UI
+    // ✅ UI update
     setMessages((prev) => [
       ...prev,
       { role: "assistant", content: answer },
     ]);
 
-    // ✅ SEND TO WIX
+    // ✅ Send to Wix (uses safe variable)
     try {
       const chatData = {
         type: "CHAT_DATA",
-        question: contextText,   // ✅ NO capturedQuestion anymore
+        question: questionText, // ✅ ALWAYS SAFE
         answer: answer,
         userId: (window as any).PMC_USER?.userId || "",
         email: (window as any).PMC_USER?.email || "",
@@ -215,7 +218,7 @@ async function sendMessage() {
     try {
       const chatData = {
         type: "CHAT_DATA",
-        question: contextText,   // ✅ FIXED HERE ALSO
+        question: questionText, // ✅ SAME SAFE VARIABLE
         answer: fallbackAnswer,
         userId: (window as any).PMC_USER?.userId || "",
         email: (window as any).PMC_USER?.email || "",
