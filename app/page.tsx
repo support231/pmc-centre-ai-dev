@@ -190,7 +190,7 @@ try {
     method: "POST",
     body: JSON.stringify({
       question: contextText,
-      mode: selectedMode,
+      mode: mode,
     }),
   });
 
