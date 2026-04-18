@@ -155,9 +155,6 @@ async function sendMessage() {
       )
       .join("\n");
 
-    // ✅ DEFINE QUESTION (THIS FIXES YOUR ERROR)
-    const capturedQuestion = contextText;
-
     const formData = new FormData();
     formData.append("question", contextText);
     formData.append("mode", mode);
@@ -174,7 +171,6 @@ async function sendMessage() {
       }
     );
 
-    // ✅ SAFE RESPONSE HANDLING (NO BREAK)
     let answer = "Error generating response.";
 
     try {
@@ -195,7 +191,7 @@ async function sendMessage() {
     try {
       const chatData = {
         type: "CHAT_DATA",
-        question: capturedQuestion,
+        question: contextText,   // ✅ NO capturedQuestion anymore
         answer: answer,
         userId: (window as any).PMC_USER?.userId || "",
         email: (window as any).PMC_USER?.email || "",
@@ -219,7 +215,7 @@ async function sendMessage() {
     try {
       const chatData = {
         type: "CHAT_DATA",
-        question: capturedQuestion,
+        question: contextText,   // ✅ FIXED HERE ALSO
         answer: fallbackAnswer,
         userId: (window as any).PMC_USER?.userId || "",
         email: (window as any).PMC_USER?.email || "",
