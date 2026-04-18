@@ -155,6 +155,7 @@ async function sendMessage() {
       )
       .join("\n");
 
+    // ✅ DEFINE QUESTION (THIS FIXES YOUR ERROR)
     const capturedQuestion = contextText;
 
     const formData = new FormData();
@@ -165,7 +166,6 @@ async function sendMessage() {
       formData.append("file", file);
     });
 
-    // ✅ ORIGINAL WORKING API (DO NOT CHANGE)
     const res = await fetch(
       `${process.env.NEXT_PUBLIC_PMC_BACKEND_URL}/ask`,
       {
@@ -174,7 +174,7 @@ async function sendMessage() {
       }
     );
 
-    // ✅ SAFE PARSE (MINIMAL CHANGE — NO BREAK)
+    // ✅ SAFE RESPONSE HANDLING (NO BREAK)
     let answer = "Error generating response.";
 
     try {
@@ -185,13 +185,13 @@ async function sendMessage() {
       answer = text || answer;
     }
 
-    // ✅ SHOW IN UI (RESTORES YOUR ORIGINAL BEHAVIOR)
+    // ✅ SHOW IN UI
     setMessages((prev) => [
       ...prev,
       { role: "assistant", content: answer },
     ]);
 
-    // ✅ SEND TO WIX (ONLY ADDITION — SAFE)
+    // ✅ SEND TO WIX
     try {
       const chatData = {
         type: "CHAT_DATA",
