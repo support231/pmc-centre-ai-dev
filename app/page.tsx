@@ -194,13 +194,6 @@ try {
     }),
   });
 
-const apiResponse = await fetch("/api/chat", {
-  method: "POST",
-  body: JSON.stringify({
-    question: contextText,
-    mode: mode,
-  }),
-});
 
 // ✅ SAFE PARSE (NO CRASH)
 let answer = "No answer received.";
