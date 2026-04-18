@@ -174,52 +174,57 @@ export default function Home() {
         }
       );
 
-      const data = await res.json();
+      // ✅ Capture question BEFORE anything changes
+const question = contextText;
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: data.answer || "No answer received.",
-        },
-      ]);
-      // ✅ SEND CHAT DATA TO WIX
-const chatData = {
-  type: "CHAT_DATA",
-  question: question, // your question variable // ✅ FIXED
-  answer: data.answer || "No answer received.",
-  userId: (window as any).PMC_USER?.userId,
-  email: (window as any).PMC_USER?.email,
-  timestamp: new Date().toISOString()
+const sendToWix = (payload: any) => {
+  try {
+    window.parent.postMessage(payload, "*");
+    console.log("📤 Sent to Wix:", payload);
+  } catch (err) {
+    console.log("⚠️ postMessage failed", err);
+  }
 };
 
-window.parent.postMessage(chatData, "*");
+try {
+  const response = await fetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({
+      question: contextText,
+      mode: selectedMode,
+    }),
+  });
 
-console.log("📤 Sent to Wix:", chatData);
-  } catch {
+  const data = await response.json();
 
-  const fallbackAnswer = "I may not have fully understood your question. Could you please clarify what you want me to focus on?";
+  const answer = data.answer || "No answer received.";
 
-  setMessages((prev) => [
-    ...prev,
-    {
-      role: "assistant",
-      content: fallbackAnswer,
-    },
-  ]);
-
-  // ✅ SEND CHAT DATA TO WIX
   const chatData = {
     type: "CHAT_DATA",
-    question: question,// ✅ FIXED
-    answer: fallbackAnswer, // ✅ NOW DEFINED
-    userId: (window as any).PMC_USER?.userId,
-    email: (window as any).PMC_USER?.email,
+    question: question,   // ✅ FIXED
+    answer: answer,
+    userId: (window as any).PMC_USER?.userId || "",
+    email: (window as any).PMC_USER?.email || "",
     timestamp: new Date().toISOString()
   };
 
-  window.parent.postMessage(chatData, "*");
+  sendToWix(chatData);
 
+} catch (error) {
+
+  const fallbackAnswer = "Error generating response.";
+
+  const chatData = {
+    type: "CHAT_DATA",
+    question: question,   // ✅ FIXED
+    answer: fallbackAnswer,
+    userId: (window as any).PMC_USER?.userId || "",
+    email: (window as any).PMC_USER?.email || "",
+    timestamp: new Date().toISOString()
+  };
+
+  sendToWix(chatData);
+}
   console.log("📤 Sent to Wix (error):", chatData);
 
     } finally {
