@@ -194,11 +194,26 @@ try {
     }),
   });
 
-  // ✅ GET RESPONSE FIRST
-const data = await response.json();
+const response = await fetch("/api/chat", {
+  method: "POST",
+  body: JSON.stringify({
+    question: contextText,
+    mode: mode,
+  }),
+});
 
-// ✅ DEFINE answer (THIS WAS MISSING)
-const answer = data?.answer || "No answer received.";
+// ✅ SAFE PARSE (NO CRASH)
+let answer = "No answer received.";
+
+try {
+  const data = await response.json();
+  answer = data?.answer || answer;
+} catch (err) {
+  console.log("⚠️ JSON parse failed, trying text");
+
+  const text = await response.text();
+  answer = text || answer;
+}
 
 // ✅ 1. SHOW IN UI
 setMessages((prev) => [
