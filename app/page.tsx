@@ -127,133 +127,115 @@ export default function Home() {
   }
 
   /* =======================
-     SEND MESSAGE
-     ======================= */
+   SEND MESSAGE
+   ======================= */
 
-  async function sendMessage() {
-    if (!input.trim() || !mode) return;
+async function sendMessage() {
+  if (!input.trim() || !mode) return;
 
-    // ✅ USER MESSAGE NOW OWNS ITS FILES
-    const userMsg: ChatMessage = {
-      role: "user",
-      content: input.trim(),
-      files: selectedFiles.length ? selectedFiles : undefined,
-    };
+  const userMsg: ChatMessage = {
+    role: "user",
+    content: input.trim(),
+    files: selectedFiles.length ? selectedFiles : undefined,
+  };
 
-    const updatedMessages = [...messages, userMsg];
-    setMessages(updatedMessages);
-    setInput("");
-    setSelectedFiles([]);
-    setLoading(true);
+  const updatedMessages = [...messages, userMsg];
+  setMessages(updatedMessages);
+  setInput("");
+  setSelectedFiles([]);
+  setLoading(true);
+
+  try {
+    const contextText = updatedMessages
+      .slice(-6)
+      .map((m) =>
+        m.role === "user"
+          ? `User: ${m.content}`
+          : `Assistant: ${m.content}`
+      )
+      .join("\n");
+
+    const capturedQuestion = contextText;
+
+    const formData = new FormData();
+    formData.append("question", contextText);
+    formData.append("mode", mode);
+
+    userMsg.files?.forEach((file) => {
+      formData.append("file", file);
+    });
+
+    // ✅ ORIGINAL WORKING API (DO NOT CHANGE)
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_PMC_BACKEND_URL}/ask`,
+      {
+        method: "POST",
+        body: formData,
+      }
+    );
+
+    // ✅ SAFE PARSE (MINIMAL CHANGE — NO BREAK)
+    let answer = "Error generating response.";
 
     try {
-      const contextText = updatedMessages
-        .slice(-6)
-        .map((m) =>
-          m.role === "user"
-            ? `User: ${m.content}`
-            : `Assistant: ${m.content}`
-        )
-        .join("\n");
-
-      const capturedQuestion = contextText; // ✅ FIX: stable question
-      const formData = new FormData();
-      formData.append("question", contextText);
-      formData.append("mode", mode);
-
-      // 🔒 backend unchanged: still receives files normally
-      userMsg.files?.forEach((file) => {
-        formData.append("file", file);
-      });
-
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_PMC_BACKEND_URL}/ask`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      // ✅ Capture question BEFORE anything changes
-
-const sendToWix = (payload: any) => {
-  try {
-    window.parent.postMessage(payload, "*");
-    console.log("📤 Sent to Wix:", payload);
-  } catch (err) {
-    console.log("⚠️ postMessage failed", err);
-  }
-};
-
-try {
-  const apiResponse = await fetch("/api/chat", {
-    method: "POST",
-    body: JSON.stringify({
-      question: contextText,
-      mode: mode,
-    }),
-  });
-
-
-// ✅ SAFE PARSE (NO CRASH)
-let answer = "No answer received.";
-
-try {
-  const data = await apiResponse.json();
-  answer = data?.answer || answer;
-} catch (err) {
-  console.log("⚠️ JSON parse failed, trying text");
-
-  const text = await apiResponse.text();
-  answer = text || answer;
-}
-
-// ✅ 1. SHOW IN UI
-setMessages((prev) => [
-  ...prev,
-  { role: "assistant", content: answer },
-]);
-
-// ✅ 2. SEND TO WIX
-const chatData = {
-  type: "CHAT_DATA",
-  question: capturedQuestion,
-  answer: answer,
-  userId: (window as any).PMC_USER?.userId || "",
-  email: (window as any).PMC_USER?.email || "",
-  timestamp: new Date().toISOString(),
-};
-
-sendToWix(chatData);
-} catch (error) {
-
-  const fallbackAnswer = "Error generating response.";
-
-// SHOW IN UI
-setMessages((prev) => [
-  ...prev,
-  { role: "assistant", content: fallbackAnswer },
-]);
-
-// SEND TO WIX
-const chatData = {
-  type: "CHAT_DATA",
-  question: capturedQuestion,
-  answer: fallbackAnswer,
-  userId: (window as any).PMC_USER?.userId || "",
-  email: (window as any).PMC_USER?.email || "",
-  timestamp: new Date().toISOString(),
-};
-
-sendToWix(chatData);
-}
-
-
-    } finally {
-      setLoading(false);
+      const data = await res.json();
+      answer = data?.answer || answer;
+    } catch (err) {
+      const text = await res.text();
+      answer = text || answer;
     }
-  }
 
+    // ✅ SHOW IN UI (RESTORES YOUR ORIGINAL BEHAVIOR)
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: answer },
+    ]);
+
+    // ✅ SEND TO WIX (ONLY ADDITION — SAFE)
+    try {
+      const chatData = {
+        type: "CHAT_DATA",
+        question: capturedQuestion,
+        answer: answer,
+        userId: (window as any).PMC_USER?.userId || "",
+        email: (window as any).PMC_USER?.email || "",
+        timestamp: new Date().toISOString(),
+      };
+
+      window.parent.postMessage(chatData, "*");
+      console.log("📤 Sent to Wix:", chatData);
+    } catch (err) {
+      console.log("⚠️ postMessage failed", err);
+    }
+
+  } catch (error) {
+    const fallbackAnswer = "Error generating response.";
+
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: fallbackAnswer },
+    ]);
+
+    try {
+      const chatData = {
+        type: "CHAT_DATA",
+        question: capturedQuestion,
+        answer: fallbackAnswer,
+        userId: (window as any).PMC_USER?.userId || "",
+        email: (window as any).PMC_USER?.email || "",
+        timestamp: new Date().toISOString(),
+      };
+
+      window.parent.postMessage(chatData, "*");
+      console.log("📤 Sent to Wix (error):", chatData);
+    } catch (err) {
+      console.log("⚠️ postMessage failed", err);
+    }
+
+  } finally {
+    setLoading(false);
+  }
+}
   /* =======================
      EDIT / COPY
      ======================= */
