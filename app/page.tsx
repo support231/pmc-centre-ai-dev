@@ -49,35 +49,64 @@ export default function Home() {
 
   useEffect(() => {
 
-  // ✅ USER DATA LISTENER
+  // -----------------------------
+  // USER DATA STORAGE
+  // -----------------------------
   (window as any).PMC_USER = {
     userId: null,
     email: null
   };
 
   const handler = (event: MessageEvent) => {
-  console.log("RAW MESSAGE:", event.origin, event.data); // ✅ ADD THIS LINE
 
-  if (!event.data || event.data.type !== "USER_DATA") return;
+    console.log("📩 RAW MESSAGE:", event.data);
 
-  (window as any).PMC_USER = {
-    userId: event.data.userId,
-    email: event.data.email
+    const data = event.data;
+
+    // =============================
+    // ✅ USER DATA
+    // =============================
+    if (data?.type === "USER_DATA") {
+
+      (window as any).PMC_USER = {
+        userId: data.userId,
+        email: data.email
+      };
+
+      console.log("✅ User received:", (window as any).PMC_USER);
+    }
+
+    // =============================
+    // 🔥 LOAD CHAT (NEW)
+    // =============================
+    if (data?.type === "LOAD_CHAT") {
+
+      console.log("📥 Loading chat:", data.messages);
+
+      if (!data.messages || data.messages.length === 0) return;
+
+      const formatted: ChatMessage[] = data.messages.map((m: any) => ({
+        role: m.role === "ai" ? "assistant" : "user",
+        content: m.text
+      }));
+
+      setMessages(formatted);
+
+      // scroll after render
+      setTimeout(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+
   };
 
-  console.log("✅ User received:", (window as any).PMC_USER);
-};
   window.addEventListener("message", handler);
 
-  // ✅ YOUR EXISTING SCROLL LOGIC (KEEP IT HERE)
-  chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-
-  // ✅ CLEANUP
   return () => {
     window.removeEventListener("message", handler);
   };
 
-}, [messages, loading]);
+}, []);
   /* =======================
      MODE / CHAT RESET
      ======================= */
