@@ -4,11 +4,11 @@ import { useState, useRef, useEffect } from "react";
 
 type Mode = "PMC" | "GENERAL" | "LIVE" | "";
 
-type ChatMessage = {
+interface ChatMessage {
   role: "user" | "assistant";
-  content: string;
-  files?: File[]; // ✅ NEW: files tied to THIS message only
-};
+  message?: string;
+  text?: string;   // ✅ ADD THIS LINE
+}
 
 // ===============================
 // BUILD CHAT HISTORY (NEW)
