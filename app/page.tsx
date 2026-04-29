@@ -17,7 +17,7 @@ type ChatMessage = {
 const buildHistory = (messages: ChatMessage[]) => {
   try {
     return messages.slice(-5).map((msg) => ({
-      role: msg.sender === "user" ? "user" : "assistant",
+      role: msg.role === "user" ? "user" : "assistant",
       content: msg.text || msg.message || "",
     }));
   } catch (error) {
