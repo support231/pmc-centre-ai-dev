@@ -8,7 +8,9 @@ interface ChatMessage {
   role: "user" | "assistant";
   message?: string;
   text?: string;
-  content?: string;   // ✅ ADD THIS LINE
+  content?: string;
+  files?: any;
+  [key: string]: any;   // ✅ future-proof (important)
 }
 
 // ===============================
