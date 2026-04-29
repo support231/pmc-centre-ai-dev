@@ -203,7 +203,7 @@ async function sendMessage() {
       }
     );
 
-    let answer = "Error generating response.";
+    let answer = "I couldn’t process that. Please rephrase or add more detail.";
 
     try {
       const data = await res.json();
@@ -237,7 +237,7 @@ async function sendMessage() {
     }
 
   } catch (error) {
-    const fallbackAnswer = "Error generating response.";
+    const fallbackAnswer = "I couldn’t process that. Please rephrase or add more detail.";
 
     setMessages((prev) => [
       ...prev,
