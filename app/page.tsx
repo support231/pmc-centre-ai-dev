@@ -17,11 +17,13 @@ interface ChatMessage {
 // BUILD CHAT HISTORY (NEW)
 // ===============================
 
-const buildHistory = (messages: ChatMessage[]) => {
+const buildHistory = (msgs?: ChatMessage[]) => {
   try {
-    return messages.slice(-5).map((msg) => ({
+    const source = msgs || messages || [];
+
+    return source.slice(-5).map((msg: any) => ({
       role: msg.role === "user" ? "user" : "assistant",
-      content: msg.text || msg.message || "",
+      content: msg.text || msg.message || msg.content || ""
     }));
   } catch (error) {
     console.error("Error building history:", error);
