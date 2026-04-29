@@ -211,13 +211,23 @@ async function sendMessage() {
       formData.append("file", file);
     });
 
-    const res = await fetch(
-      `${process.env.NEXT_PUBLIC_PMC_BACKEND_URL}/ask`,
-      {
-        method: "POST",
-        body: formData,
-      }
-    );
+// ===============================
+// API CALL (UPDATED)
+// ===============================
+
+const history = buildHistory();
+
+const response = await fetch("https://pmc-backend-dev.onrender.com/ask", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    question: input,
+    mode,
+    history // ✅ MAIN FIX
+  })
+});
 
     let answer = "I couldn’t process that. Please rephrase or add more detail.";
 
