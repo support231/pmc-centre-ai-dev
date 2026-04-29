@@ -7,7 +7,8 @@ type Mode = "PMC" | "GENERAL" | "LIVE" | "";
 interface ChatMessage {
   role: "user" | "assistant";
   message?: string;
-  text?: string;   // ✅ ADD THIS LINE
+  text?: string;
+  content?: string;   // ✅ ADD THIS LINE
 }
 
 // ===============================
