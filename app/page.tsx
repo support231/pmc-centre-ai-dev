@@ -14,14 +14,14 @@ type ChatMessage = {
 // BUILD CHAT HISTORY (NEW)
 // ===============================
 
-const buildHistory = () => {
+const buildHistory = (messages: ChatMessage[]) => {
   try {
-    return ChatMessage.slice(-5).map((msg: any) => ({
+    return messages.slice(-5).map((msg) => ({
       role: msg.sender === "user" ? "user" : "assistant",
-      content: msg.text || msg.message || ""
+      content: msg.text || msg.message || "",
     }));
-  } catch (e) {
-    console.error("History build error:", e);
+  } catch (error) {
+    console.error("Error building history:", error);
     return [];
   }
 };
