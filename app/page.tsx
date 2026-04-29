@@ -10,6 +10,22 @@ type ChatMessage = {
   files?: File[]; // ✅ NEW: files tied to THIS message only
 };
 
+// ===============================
+// BUILD CHAT HISTORY (NEW)
+// ===============================
+
+const buildHistory = () => {
+  try {
+    return messages.slice(-5).map((msg: any) => ({
+      role: msg.sender === "user" ? "user" : "assistant",
+      content: msg.text || msg.message || ""
+    }));
+  } catch (e) {
+    console.error("History build error:", e);
+    return [];
+  }
+};
+
 /* =======================
    FILE TYPE CONTROL
    ======================= */
