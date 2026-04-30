@@ -56,26 +56,31 @@ export default function Home() {
   };
 
   const handler = (event: MessageEvent) => {
-  console.log("RAW MESSAGE:", event.origin, event.data); // ✅ ADD THIS LINE
+  console.log("RAW MESSAGE:", event.origin, event.data);
 
-  if (!event.data || event.data.type !== "USER_DATA") return;
+  if (!event.data?.type) return;
 
-  (window as any).PMC_USER = {
-    userId: event.data.userId,
-    email: event.data.email
-  };
+  if (event.data.type === "USER_DATA") {
+    (window as any).PMC_USER = {
+      userId: event.data.userId,
+      email: event.data.email
+    };
+    console.log("✅ User received:", (window as any).PMC_USER);
+    return;
+  }
 
-  console.log("✅ User received:", (window as any).PMC_USER);
+  if (event.data.type === "LOAD_CHAT") {
+    const incoming = Array.isArray(event.data.messages) ? event.data.messages : [];
+    console.log("✅ Loading chat messages:", incoming.length);
+
+    // IMPORTANT: update your React state here
+    // Example (use your actual state setter):
+    setMessages(incoming);
+
+    return;
+  }
 };
-  window.addEventListener("message", handler);
-
-  // ✅ YOUR EXISTING SCROLL LOGIC (KEEP IT HERE)
-  chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-
-  // ✅ CLEANUP
-  return () => {
-    window.removeEventListener("message", handler);
-  };
+window.addEventListener("message", handler);
 
 }, [messages, loading]);
   /* =======================
