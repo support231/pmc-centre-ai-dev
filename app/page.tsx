@@ -208,7 +208,7 @@ async function sendMessage() {
     }
 
   } catch (error) {
-    const fallbackAnswer = “I couldn’t process that. Please rephrase or add more detail.”;
+    const fallbackAnswer = "I couldn't process that. Please rephrase or add more detail.";
 
     setMessages((prev) => [
       ...prev,
