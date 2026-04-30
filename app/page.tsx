@@ -49,40 +49,55 @@ export default function Home() {
 
   useEffect(() => {
 
-  // ✅ USER DATA LISTENER
   (window as any).PMC_USER = {
     userId: null,
     email: null
   };
 
   const handler = (event: MessageEvent) => {
-  console.log("RAW MESSAGE:", event.origin, event.data);
 
-  if (!event.data?.type) return;
+    console.log("📩 RAW MESSAGE:", event.data);
 
-  if (event.data.type === "USER_DATA") {
-    (window as any).PMC_USER = {
-      userId: event.data.userId,
-      email: event.data.email
-    };
-    console.log("✅ User received:", (window as any).PMC_USER);
-    return;
-  }
+    const data = event.data;
 
-  if (event.data.type === "LOAD_CHAT") {
-    const incoming = Array.isArray(event.data.messages) ? event.data.messages : [];
-    console.log("✅ Loading chat messages:", incoming.length);
+    // =============================
+    // USER DATA
+    // =============================
+    if (data?.type === "USER_DATA") {
+      (window as any).PMC_USER = {
+        userId: data.userId,
+        email: data.email
+      };
+    }
 
-    // IMPORTANT: update your React state here
-    // Example (use your actual state setter):
-    setMessages(incoming);
+    // =============================
+    // LOAD CHAT (CRITICAL)
+    // =============================
+    if (data?.type === "LOAD_CHAT") {
 
-    return;
-  }
-};
-window.addEventListener("message", handler);
+      if (!data.messages || data.messages.length === 0) return;
 
-}, [messages, loading]);
+      const formatted = data.messages.map((m: any) => ({
+        role: m.role === "ai" ? "assistant" : "user",
+        content: m.text
+      }));
+
+      setMessages(formatted);
+
+      setTimeout(() => {
+        chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      }, 100);
+    }
+
+  };
+
+  window.addEventListener("message", handler);
+
+  return () => {
+    window.removeEventListener("message", handler);
+  };
+
+}, []);
   /* =======================
      MODE / CHAT RESET
      ======================= */
