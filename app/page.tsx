@@ -230,7 +230,7 @@ const response = await fetch("https://pmc-backend-dev.onrender.com/ask", {
   body: JSON.stringify({
     question: input,
     mode,
-    history // ✅ MAIN FIX
+    history: buildHistory(messages) // ✅ MAIN FIX
   })
 });
 
