@@ -194,67 +194,66 @@ async function sendMessage() {
       }
     );
 
-    let answer = "";
+  let answer = "I couldn’t process that. Please rephrase or add more detail.";
 
-try {
-  const data = await res.json();
-  answer = data?.answer || "";
-} catch (err) {
-  const text = await res.text();
-  answer = text || "";
-}
+    try {
+      const data = await res.json();
+      answer = data?.answer || answer;
+    } catch (err) {
+      const text = await res.text();
+      answer = text || answer;
+    }
 
-// ✅ UI update (always show whatever we got)
-setMessages((prev) => [
-  ...prev,
-  { role: "assistant", content: answer },
-]);
+    // ✅ UI update
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: answer },
+    ]);
 
-// ✅ Send to Wix
-try {
-  const chatData = {
-    type: "CHAT_DATA",
-    question: questionText,
-    answer: answer,
-    userId: (window as any).PMC_USER?.userId || "",
-    email: (window as any).PMC_USER?.email || "",
-    timestamp: new Date().toISOString(),
-  };
+    // ✅ Send to Wix (uses safe variable)
+    try {
+      const chatData = {
+        type: "CHAT_DATA",
+        question: questionText, // ✅ ALWAYS SAFE
+        answer: answer,
+        userId: (window as any).PMC_USER?.userId || "",
+        email: (window as any).PMC_USER?.email || "",
+        timestamp: new Date().toISOString(),
+      };
 
-  window.parent.postMessage(chatData, "*");
-  console.log("📤 Sent to Wix:", chatData);
-} catch (err) {
-  console.log("⚠️ postMessage failed", err);
-}
+      window.parent.postMessage(chatData, "*");
+      console.log("📤 Sent to Wix:", chatData);
+    } catch (err) {
+      console.log("⚠️ postMessage failed", err);
+    }
 
-} catch (error) {
+  } catch (error) {
+    const fallbackAnswer = "I couldn't process that. Please rephrase or add more detail.";
 
-  // ✅ ONLY system-level message (NOT AI fallback)
-  const errorMessage = "Something went wrong. Please try again.";
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: fallbackAnswer },
+    ]);
 
-  setMessages((prev) => [
-    ...prev,
-    { role: "assistant", content: errorMessage },
-  ]);
+    try {
+      const chatData = {
+        type: "CHAT_DATA",
+        question: questionText, // ✅ SAME SAFE VARIABLE
+        answer: fallbackAnswer,
+        userId: (window as any).PMC_USER?.userId || "",
+        email: (window as any).PMC_USER?.email || "",
+        timestamp: new Date().toISOString(),
+      };
 
-  try {
-    const chatData = {
-      type: "CHAT_DATA",
-      question: questionText,
-      answer: errorMessage,
-      userId: (window as any).PMC_USER?.userId || "",
-      email: (window as any).PMC_USER?.email || "",
-      timestamp: new Date().toISOString(),
-    };
+      window.parent.postMessage(chatData, "*");
+      console.log("📤 Sent to Wix (error):", chatData);
+    } catch (err) {
+      console.log("⚠️ postMessage failed", err);
+    }
 
-    window.parent.postMessage(chatData, "*");
-    console.log("📤 Sent to Wix (error):", chatData);
-  } catch (err) {
-    console.log("⚠️ postMessage failed", err);
+  } finally {
+    setLoading(false);
   }
-
-} finally {
-  setLoading(false);
 }
   /* =======================
      EDIT / COPY
@@ -641,4 +640,3 @@ const uploadBtn = {
   fontSize: 18,
   cursor: "pointer",
 };
-}
