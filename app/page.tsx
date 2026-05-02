@@ -194,7 +194,7 @@ async function sendMessage() {
       }
     );
 
-  let answer = "I couldn’t process that. Please rephrase or add more detail.";
+  let answer = "";
 
     try {
       const data = await res.json();
@@ -228,7 +228,7 @@ async function sendMessage() {
     }
 
   } catch (error) {
-    const fallbackAnswer = "I couldn't process that. Please rephrase or add more detail.";
+    const fallbackAnswer = "";
 
     setMessages((prev) => [
       ...prev,
