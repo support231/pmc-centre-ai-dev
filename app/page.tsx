@@ -179,9 +179,14 @@ async function sendMessage() {
       .join("\n");
 
     const formData = new FormData();
-    formData.append("question", contextTextLocal);
+    formData.append("question", input);
     formData.append("mode", mode);
 
+    // ✅ ADD THIS
+    formData.append(
+    "lastAnswer",
+    messages.length > 0 ? messages[messages.length - 1].content : ""
+    );
     userMsg.files?.forEach((file) => {
       formData.append("file", file);
     });
