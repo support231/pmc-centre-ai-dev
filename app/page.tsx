@@ -308,6 +308,7 @@ async function sendMessage() {
         height: "100vh",
         display: "flex",
         flexDirection: "column",
+        overflow: "hidden", // ✅ ADD THIS (CRITICAL)
       }}
     >
       {/* HEADER */}
@@ -370,6 +371,7 @@ async function sendMessage() {
           display: "flex",
           flexDirection: "column",
           flex: 1,
+          overflow: "hidden", // ✅ ADD THIS
         }}
       >
         {/* TOOLBAR */}
